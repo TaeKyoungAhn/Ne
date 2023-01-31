@@ -58,6 +58,7 @@ public class TabEventHandler : MonoBehaviour
             }
             else
             {
+                //panelToSwap[i].GetComponent<Manager>().RefreshCategory();
                 panelToSwap[i].SetActive(false);
             }
         }
@@ -72,6 +73,7 @@ public class TabEventHandler : MonoBehaviour
                 continue;
             }
              button.backGround.sprite = button.tabButtonIdle;
+            
         }
     }
 }

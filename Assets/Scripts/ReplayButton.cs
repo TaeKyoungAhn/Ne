@@ -20,6 +20,7 @@ public class ReplayButton : MonoBehaviour
         imageRoulette.timer = 3f;
         imageRoulette.texts.sprite = imageRoulette.deaultText;
         imageRoulette.captureBtn.SetActive(false);
+        
         imageRoulette.topText.sprite = imageRoulette.topTextImg[0];
         SelectButtons.GetComponent<Button>().interactable = true;
         GetComponent<Transform>().gameObject.SetActive(false);

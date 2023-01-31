@@ -12,6 +12,8 @@ public class ImageRoulette : MonoBehaviour
     public Sprite[] topTextImg;
     public float timer = 3f;
 
+    public List<string> selectedTexts = new List<string>();
+
     public GameObject replayBtn;
     public GameObject captureBtn;
 
@@ -51,6 +53,29 @@ public class ImageRoulette : MonoBehaviour
         captureBtn.SetActive(true);
     }
 
-    
+    public void OnSelectButtonClick()
+    {
+        StartCoroutine(RouletteSelectedText());
+    }
 
+
+    IEnumerator RouletteSelectedText()
+    {
+        while (timer > 0)
+        {
+            yield return null;
+            timer -= Time.deltaTime;
+            if (timer > 0.3f)
+            {
+                
+            }
+            else if (timer < 0.3f)
+            {
+              
+            }
+            Debug.Log(timer);
+        }
+        replayBtn.SetActive(true);
+        captureBtn.SetActive(true);
+    }
 }

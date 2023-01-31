@@ -3,8 +3,11 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
+#if UNITY_ANDROID
 using UnityEngine.Android;
+#endif
 using UnityEngine.UI;
+
 
 public class CaptureScreen : MonoBehaviour
 {
@@ -22,11 +25,11 @@ public class CaptureScreen : MonoBehaviour
     {
         get
         {
-#if UNITY_EDITOR || UNITY_STANDALONE
-            return Application.dataPath;
-#elif UNITY_ANDROID
+#if UNITY_ANDROID
             return $"/storage/emulated/0/DCIM/{Application.productName}/";
             //return Application.persistentDataPath;
+#elif   UNITY_EDITOR || UNITY_STANDALONE
+            return Application.dataPath;
 #endif
         }
     }
@@ -57,6 +60,32 @@ public class CaptureScreen : MonoBehaviour
         yield return new WaitForEndOfFrame();
         CaptureScreenAndSave();
     }
+
+#if UNITY_ANDROID
+    /// <summary> 안드로이드 - 권한 확인하고, 승인시 동작 수행하기 </summary>
+    private void CheckAndroidPermissionAndDo(string permission, Action actionIfPermissionGranted)
+    {
+        // 안드로이드 : 저장소 권한 확인하고 요청하기
+        if (Permission.HasUserAuthorizedPermission(permission) == false)
+        {
+            PermissionCallbacks pCallbacks = new PermissionCallbacks();
+            pCallbacks.PermissionGranted += str => Debug.Log($"{str} 승인");
+            
+            pCallbacks.PermissionGranted += _ => actionIfPermissionGranted(); // 승인 시 기능 실행
+
+            pCallbacks.PermissionDenied += str => Debug.Log($"{str} 거절");
+           
+            pCallbacks.PermissionDeniedAndDontAskAgain += str => Debug.Log($"{str} 거절 및 다시는 보기 싫음");
+           
+
+            Permission.RequestUserPermission(permission, pCallbacks);
+        }
+        else
+        {
+            actionIfPermissionGranted(); // 바로 기능 실행
+        }
+    }
+#endif
 
 
     private void CaptureScreenAndSave()
@@ -101,33 +130,6 @@ public class CaptureScreen : MonoBehaviour
         // 갤러리 갱신
         RefreshAndroidGallery(totalPath);
     }
-
-
-
-#if UNITY_ANDROID
-    /// <summary> 안드로이드 - 권한 확인하고, 승인시 동작 수행하기 </summary>
-    private void CheckAndroidPermissionAndDo(string permission, Action actionIfPermissionGranted)
-    {
-        // 안드로이드 : 저장소 권한 확인하고 요청하기
-        if (Permission.HasUserAuthorizedPermission(permission) == false)
-        {
-            PermissionCallbacks pCallbacks = new PermissionCallbacks();
-            pCallbacks.PermissionGranted += str => Debug.Log($"{str} 승인");
-            pCallbacks.PermissionGranted += _ => actionIfPermissionGranted(); // 승인 시 기능 실행
-
-            pCallbacks.PermissionDenied += str => Debug.Log($"{str} 거절");
-
-            pCallbacks.PermissionDeniedAndDontAskAgain += str => Debug.Log($"{str} 거절 및 다시는 보기 싫음");
-
-            Permission.RequestUserPermission(permission, pCallbacks);
-        }
-        else
-        {
-            actionIfPermissionGranted(); // 바로 기능 실행
-        }
-    }
-#endif
-
 
     [System.Diagnostics.Conditional("UNITY_ANDROID")]
     private void RefreshAndroidGallery(string imageFilePath)
